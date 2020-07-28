@@ -13,6 +13,66 @@
  */
 
 
+
+// 参考代码,
+char *decodeString(char *s)
+{
+    if (s == NULL) {
+        return NULL;
+    }
+    //
+    char *a = strdup(s);
+    while (true) {
+        int len = strlen(a);
+        int left = 0, right = len;
+        int i = len - 1, num = 0, w = 1;
+        // 从右侧开始遍历, 碰到的第一个数字, 就是最里面的嵌套, 定位"["和"]"的位置
+        for (; i >= 0; i--) {
+            if (a[i] == ']') {
+                right = i;
+            } else if(a[i] == '[') {
+                left = i;
+            } else if (a[i] >= '0' && a[i] <= '9') {
+                do { // 组合数字
+                    num += w * (a[i] - '0');
+                    w *= 10;
+                    i--;
+                } while (i >= 0 && (a[i] >= '0' && a[i] <= '9'));
+                break;
+            }
+        }
+        // 遍历掉所有的中括号则返回结果
+        if (num == 0) { //没有[]了
+            return a;
+        } else {
+            // 对找到子串做展开操作, 直到没有子串
+            // 子串长度
+            int slen = (right - left - 1);
+            //
+            int count = (i + 1) + (len - right - 1) + num * slen + 1;
+            char *t = (char*)calloc(count, sizeof(char));
+            if (i + 1 > 0) { // 左侧复制
+                memcpy(t, a, i + 1);
+            }
+            for (int k = 0; k < num; k++) { // 中,即子串复制
+                memcpy(t + (i + 1) + k * slen, a + left + 1, slen);
+            }
+            if (len - right - 1 > 0) { // 尾巴复制
+                memcpy(t + (i + 1) + num * slen, a + right + 1, len - right - 1);
+            }
+            free(a);
+            a = t;
+        }
+    }
+}
+//
+// 作者：ni8fun
+// 链接：https://leetcode-cn.com/problems/decode-string/solution/fan-fu-sao-miao-shuang-100-by-ni8fun/
+// 来源：力扣（LeetCode）
+// 著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
+
+
+
 // 字符数组转int
 int char2int(char *s, int count) {
     int number = 0;
